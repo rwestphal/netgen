@@ -1,0 +1,61 @@
+#!/usr/bin/env ruby
+#$VERBOSE = true
+
+require 'bundler/setup'
+require 'optparse'
+require 'yaml'
+require 'fileutils'
+require 'netgen'
+
+# signal handler
+trap(:INT) do
+  exit(0)
+end
+
+opts = OptionParser.new do |op|
+  op.banner = "netgen-exec - Run command in the given netgen node.\n\n"\
+              "Usage: #{__FILE__} [OPTIONS] NODE COMMAND"
+  op.separator 'Help menu:'
+  op.on('-h', '--help', 'Display this help and exit') do
+    puts opts
+    exit 0
+  end
+  op.on('-v', '--version', 'Print program version') do
+    puts "netgen v#{Netgen::VERSION}"
+    exit 0
+  end
+  op.separator ''
+  op.separator 'Example:'
+  op.separator "    #{__FILE__} rt1 bash"
+  op.separator ''
+end
+
+# Main
+begin
+  opts.parse!
+rescue OptionParser::ParseError => e
+  $stderr.puts e.message
+  $stderr.puts e.backtrace
+  exit(1)
+end
+if ARGV.size < 2
+  puts opts.help
+  exit(1)
+end
+node = ARGV[0]
+command = ARGV[1..-1].join(" ")
+
+filename = "#{Netgen::Config::NETGEN_RUNSTATEDIR}/pids.yml"
+begin
+  pids = YAML.load_file(filename)
+rescue SystemCallError, Psych::SyntaxError => e
+  $stderr.puts "error: netgen is not running"
+  exit(1)
+end
+pid = pids[node]
+unless pid
+  puts "error: node #{node} doesn't exist"
+  exit(1)
+end
+
+exec("nsenter -t #{pid} --mount --net --pid --wd=. #{command}")
