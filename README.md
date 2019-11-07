@@ -16,10 +16,21 @@ RHEL/Fedora-based Linux distributions:
 # yum install ruby ruby-devel
 ```
 
-2- Install the bundler gem:
+2- Install the bundler gem (version 1.15 is needed):
 ```
-# gem install bundler
+# gem install bundler -v 1.15
+# bundle _1.15_ install
 ```
+
+If you are getting timeouts you might have run into an [IPv6 issue](https://help.rubygems.org/discussions/problems/31074-timeout-error).
+On systemd enabled systems you can use
+
+```
+sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sysctl -w net.ipv6.conf.default.disable_ipv6=1
+```
+
+to disable IPv6.
 
 3 -Download and install netgen:
 ```
