@@ -5,6 +5,8 @@ module Netgen
     end
 
     def node_init(node)
+      node.spawn('modprobe mpls_router')
+      node.spawn('modprobe mpls_iptunnel')
       node.spawn('sysctl -wq net.mpls.platform_labels=1048575')
     end
 
