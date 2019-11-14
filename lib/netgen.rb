@@ -42,7 +42,7 @@ module Netgen
 end
 
 require_relative 'netgen/plugin'
-#require_relative 'netgen/plugins/shell'
+require_relative 'netgen/plugins/shell'
 require_relative 'netgen/plugins/ethernet'
 require_relative 'netgen/plugins/ipv4'
 require_relative 'netgen/plugins/ipv6'
