@@ -61,9 +61,9 @@ module Netgen
       return unless frr_attr
       @@daemons.each do |daemon|
         next unless frr_attr.has_key?(daemon)
-        next if frr_attr.dig('run') == false
-        delay = frr_attr.dig('delay') || nil
-        args = frr_attr.dig('args') || ''
+        next if frr_attr.dig(daemon, 'run') == false
+        delay = frr_attr.dig(daemon, 'delay') || nil
+        args = frr_attr.dig(daemon, 'args') || ''
 
         # HACK: remove me!
         if daemon == "staticd"
