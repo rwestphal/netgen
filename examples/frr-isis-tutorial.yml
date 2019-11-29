@@ -1,0 +1,466 @@
+#
+#                         +---------+
+#                         |         |
+#                         |   SRC   |
+#                         | 9.9.9.1 |
+#                         |         |
+#                         +---------+
+#                              |eth-rt1 (.1)
+#                              |
+#                              |10.0.10.0/24
+#                              |
+#                              |eth-src (.2)
+#                         +---------+
+#                         |         |
+#                         |   RT1   |
+#                         | 1.1.1.1 |
+#                         |         |
+#                         +---------+
+#                              |eth-sw1
+#                              |
+#                              |
+#                              |
+#         +---------+          |          +---------+
+#         |         |          |          |         |
+#         |   RT2   |eth-sw1   |   eth-sw1|   RT3   |
+#         | 2.2.2.2 +----------+----------+ 3.3.3.3 |
+#         |         |     10.0.1.0/24     |         |
+#         +---------+                     +---------+
+#    eth-rt4-1|  |eth-rt4-2          eth-rt5-1|  |eth-rt5-2
+#             |  |                            |  |
+#  10.0.2.0/24|  |10.0.3.0/24      10.0.4.0/24|  |10.0.5.0/24
+#             |  |                            |  |
+#    eth-rt2-1|  |eth-rt2-2          eth-rt3-1|  |eth-rt3-2
+#         +---------+                     +---------+
+#         |         |                     |         |
+#         |   RT4   |     10.0.6.0/24     |   RT5   |
+#         | 4.4.4.4 +---------------------+ 5.5.5.5 |
+#         |         |eth-rt5       eth-rt4|         |
+#         +---------+                     +---------+
+#       eth-rt6|                                |eth-rt6
+#              |                                |
+#   10.0.7.0/24|                                |10.0.8.0/24
+#              |          +---------+           |
+#              |          |         |           |
+#              |          |   RT6   |           |
+#              +----------+ 6.6.6.6 +-----------+
+#                  eth-rt4|         |eth-rt5
+#                         +---------+
+#                              |eth-dst (.1)
+#                              |
+#                              |10.0.11.0/24
+#                              |
+#                              |eth-rt6 (.2)
+#                         +---------+
+#                         |         |
+#                         |   DST   |
+#                         | 9.9.9.2 |
+#                         |         |
+#                         +---------+
+#
+
+---
+
+routers:
+
+  src:
+    links:
+      lo:
+        ipv4: 9.9.9.1/32
+        ipv6: 2001:db8:1066::1/128
+        mpls: yes
+      eth-rt1:
+        peer: [rt1, eth-src]
+        ipv4: 10.0.10.1/24
+        mpls: yes
+    shell: |
+      ip route add 9.9.9.2/32 via inet 10.0.10.2 src 9.9.9.1
+
+  rt1:
+    links:
+      lo:
+        ipv4: 1.1.1.1/32
+        ipv6: 2001:db8:1000::1/128
+        mpls: yes
+      eth-sw1:
+        peer: [sw1, sw1-rt1]
+        ipv4: 10.0.1.1/24
+        mpls: yes
+      eth-src:
+        peer: [src, eth-rt1]
+        ipv4: 10.0.10.2/24
+        mpls: yes
+    frr:
+      zebra:
+        run: yes
+        config:
+      staticd:
+        run: yes
+        config: |
+          ip route 9.9.9.1/32 10.0.10.1
+          !
+      isisd:
+        run: yes
+        config: |
+          interface lo
+           ip router isis 1
+           ipv6 router isis 1
+           isis passive
+          !
+          interface eth-sw1
+           ip router isis 1
+           ipv6 router isis 1
+           isis hello-multiplier 3
+          !
+          interface eth-src
+           ip router isis 1
+           ipv6 router isis 1
+           isis network point-to-point
+           isis hello-multiplier 3
+          !
+          router isis 1
+           net 49.0000.0000.0000.0001.00
+           is-type level-1
+           redistribute ipv4 static level-1
+           redistribute ipv4 connected level-1
+           topology ipv6-unicast
+          !
+
+  rt2:
+    links:
+      lo:
+        ipv4: 2.2.2.2/32
+        ipv6: 2001:db8:1000::2/128
+        mpls: yes
+      eth-sw1:
+        peer: [sw1, sw1-rt2]
+        ipv4: 10.0.1.2/24
+        mpls: yes
+      eth-rt4-1:
+        peer: [rt4, eth-rt2-1]
+        ipv4: 10.0.2.2/24
+        mpls: yes
+      eth-rt4-2:
+        peer: [rt4, eth-rt2-2]
+        ipv4: 10.0.3.2/24
+        mpls: yes
+    frr:
+      zebra:
+        run: yes
+        config:
+      isisd:
+        run: yes
+        config: |
+          interface lo
+           ip router isis 1
+           ipv6 router isis 1
+           isis passive
+          !
+          interface eth-sw1
+           ip router isis 1
+           ipv6 router isis 1
+           isis hello-multiplier 3
+          !
+          interface eth-rt4-1
+           ip router isis 1
+           ipv6 router isis 1
+           isis network point-to-point
+           isis hello-multiplier 3
+          !
+          interface eth-rt4-2
+           ip router isis 1
+           ipv6 router isis 1
+           isis network point-to-point
+           isis hello-multiplier 3
+          !
+          router isis 1
+           net 49.0000.0000.0000.0002.00
+           is-type level-1
+           topology ipv6-unicast
+          !
+
+  rt3:
+    links:
+      lo:
+        ipv4: 3.3.3.3/32
+        ipv6: 2001:db8:1000::3/128
+        mpls: yes
+      eth-sw1:
+        peer: [sw1, sw1-rt3]
+        ipv4: 10.0.1.3/24
+        mpls: yes
+      eth-rt5-1:
+        peer: [rt5, eth-rt3-1]
+        ipv4: 10.0.4.3/24
+        mpls: yes
+      eth-rt5-2:
+        peer: [rt5, eth-rt3-2]
+        ipv4: 10.0.5.3/24
+        mpls: yes
+    frr:
+      zebra:
+        run: yes
+        config:
+      isisd:
+        run: yes
+        config: |
+          interface lo
+           ip router isis 1
+           ipv6 router isis 1
+           isis passive
+          !
+          interface eth-sw1
+           ip router isis 1
+           ipv6 router isis 1
+           isis hello-multiplier 3
+          !
+          interface eth-rt5-1
+           ip router isis 1
+           ipv6 router isis 1
+           isis network point-to-point
+           isis hello-multiplier 3
+          !
+          interface eth-rt5-2
+           ip router isis 1
+           ipv6 router isis 1
+           isis network point-to-point
+           isis hello-multiplier 3
+          !
+          router isis 1
+           net 49.0000.0000.0000.0003.00
+           is-type level-1
+           topology ipv6-unicast
+          !
+
+  rt4:
+    links:
+      lo:
+        ipv4: 4.4.4.4/32
+        ipv6: 2001:db8:1000::4/128
+        mpls: yes
+      eth-rt2-1:
+        peer: [rt2, eth-rt4-1]
+        ipv4: 10.0.2.4/24
+        mpls: yes
+      eth-rt2-2:
+        peer: [rt2, eth-rt4-2]
+        ipv4: 10.0.3.4/24
+        mpls: yes
+      eth-rt5:
+        peer: [rt5, eth-rt4]
+        ipv4: 10.0.6.4/24
+        mpls: yes
+      eth-rt6:
+        peer: [rt6, eth-rt4]
+        ipv4: 10.0.7.4/24
+        mpls: yes
+    frr:
+      zebra:
+        run: yes
+        config:
+      isisd:
+        run: yes
+        config: |
+          interface lo
+           ip router isis 1
+           ipv6 router isis 1
+           isis passive
+          !
+          interface eth-rt2-1
+           ip router isis 1
+           ipv6 router isis 1
+           isis network point-to-point
+           isis hello-multiplier 3
+          !
+          interface eth-rt2-2
+           ip router isis 1
+           ipv6 router isis 1
+           isis network point-to-point
+           isis hello-multiplier 3
+          !
+          interface eth-rt5
+           ip router isis 1
+           ipv6 router isis 1
+           isis network point-to-point
+           isis hello-multiplier 3
+          !
+          interface eth-rt6
+           ip router isis 1
+           ipv6 router isis 1
+           isis network point-to-point
+           isis hello-multiplier 3
+          !
+          router isis 1
+           net 49.0000.0000.0000.0004.00
+           is-type level-1
+           topology ipv6-unicast
+          !
+
+  rt5:
+    links:
+      lo:
+        ipv4: 5.5.5.5/32
+        ipv6: 2001:db8:1000::5/128
+        mpls: yes
+      eth-rt3-1:
+        peer: [rt3, eth-rt5-1]
+        ipv4: 10.0.4.5/24
+        mpls: yes
+      eth-rt3-2:
+        peer: [rt3, eth-rt5-2]
+        ipv4: 10.0.5.5/24
+        mpls: yes
+      eth-rt4:
+        peer: [rt4, eth-rt5]
+        ipv4: 10.0.6.5/24
+        mpls: yes
+      eth-rt6:
+        peer: [rt6, eth-rt5]
+        ipv4: 10.0.8.5/24
+        mpls: yes
+    frr:
+      zebra:
+        run: yes
+        config:
+      isisd:
+        run: yes
+        config: |
+          interface lo
+           ip router isis 1
+           ipv6 router isis 1
+           isis passive
+          !
+          interface eth-rt3-1
+           ip router isis 1
+           ipv6 router isis 1
+           isis network point-to-point
+           isis hello-multiplier 3
+          !
+          interface eth-rt3-2
+           ip router isis 1
+           ipv6 router isis 1
+           isis network point-to-point
+           isis hello-multiplier 3
+          !
+          interface eth-rt4
+           ip router isis 1
+           ipv6 router isis 1
+           isis network point-to-point
+           isis hello-multiplier 3
+          !
+          interface eth-rt6
+           ip router isis 1
+           ipv6 router isis 1
+           isis network point-to-point
+           isis hello-multiplier 3
+          !
+          router isis 1
+           net 49.0000.0000.0000.0005.00
+           is-type level-1
+           topology ipv6-unicast
+          !
+
+  rt6:
+    links:
+      lo:
+        ipv4: 6.6.6.6/32
+        ipv6: 2001:db8:1000::6/128
+        mpls: yes
+      eth-rt4:
+        peer: [rt4, eth-rt6]
+        ipv4: 10.0.7.6/24
+        mpls: yes
+      eth-rt5:
+        peer: [rt5, eth-rt6]
+        ipv4: 10.0.8.6/24
+        mpls: yes
+      eth-dst:
+        peer: [dst, eth-rt6]
+        ipv4: 10.0.11.1/24
+        mpls: yes
+    frr:
+      zebra:
+        run: yes
+        config:
+      staticd:
+        run: yes
+        config: |
+          ip route 9.9.9.2/32 10.0.11.2
+      isisd:
+        run: yes
+        config: |
+          interface lo
+           ip router isis 1
+           ipv6 router isis 1
+           isis passive
+          !
+          interface eth-rt4
+           ip router isis 1
+           ipv6 router isis 1
+           isis network point-to-point
+           isis hello-multiplier 3
+          !
+          interface eth-rt5
+           ip router isis 1
+           ipv6 router isis 1
+           isis network point-to-point
+           isis hello-multiplier 3
+          !
+          interface eth-dst
+           ip router isis 1
+           ipv6 router isis 1
+           isis network point-to-point
+           isis hello-multiplier 3
+          !
+          router isis 1
+           net 49.0000.0000.0000.0006.00
+           is-type level-1
+           redistribute ipv4 static level-1
+           redistribute ipv4 connected level-1
+           topology ipv6-unicast
+          !
+
+  dst:
+    links:
+      lo:
+        ipv4: 9.9.9.2/32
+        ipv6: 2001:db8:1066::2/128
+        mpls: yes
+      eth-rt6:
+        peer: [rt6, eth-dst]
+        ipv4: 10.0.11.2/24
+        mpls: yes
+    shell: |
+      ip route add 9.9.9.1/32 via inet 10.0.11.1
+
+switches:
+  sw1:
+    links:
+      sw1-rt1:
+        peer: [rt1, rt1-sw1]
+      sw1-rt2:
+        peer: [rt2, rt2-sw1]
+      sw1-rt3:
+        peer: [rt3, rt3-sw1]
+
+
+frr:
+  #perf: yes
+  #valgrind: yes
+  base-configs:
+    all: |
+      hostname %(node)
+      password 1
+      log file %(logdir)/%(node)-%(daemon).log
+      log commands
+    zebra: |
+      debug zebra kernel
+      debug zebra packet
+      debug zebra mpls
+    isisd: |
+      debug isis events
+      debug isis route-events
+      debug isis spf-events
+      debug isis sr-events
+      debug isis lsp-gen
+
