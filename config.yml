@@ -8,40 +8,17 @@
 
 # Valgrind parameters.
 # Default: "--tool=memcheck"
-#valgrind_params: "--tool=memcheck --leak-check=full --trace-children=yes"
-#valgrind_params: "--tool=memcheck"
-valgrind_params: "--tool=memcheck --leak-check=full"
-#valgrind_params: "--tool=memcheck --leak-check=full --show-leak-kinds=all"
-#valgrind_params: "--tool=callgrind --dump-instr=yes --collect-jumps=yes"
+# valgrind_params: "--tool=memcheck --leak-check=full --trace-children=yes"
+# valgrind_params: "--tool=memcheck --leak-check=full"
+# valgrind_params: "--tool=memcheck --leak-check=full --show-leak-kinds=all"
+# valgrind_params: "--tool=callgrind --dump-instr=yes --collect-jumps=yes"
 
 # Perf directory
 # Default: [netgen_runstatedir]/perf
-perf_dir: "/mnt/renato/perf"
+# perf_dir:
 
 # Plugins configuration.
 plugins:
-  tcpdump:
-    # Directory to store tcpdump captures.
-    # Default: [netgen_runstatedir]/pcaps
-    pcap_dir: "/mnt/renato/netgen-pcaps"
-
-    # Filter on which nodes tcpdump should run.
-    # Default: []
-    #whitelist: [ce1]
-
-    # Filter on which nodes tcpdump should not run.
-    # Default: []
-    # blacklist: []
-
-  tmux:
-    # Path of tmux script used to open a shell on all routers.
-    # Default: [netgen_runstatedir]/tmux.sh
-    # file:
-
-    # Panels per node.
-    # Default: 1
-    # panels-per-node:
-
   frr:
     # FRR's sysconfdir (--sysconfdir).
     # Default: "/etc/frr"
@@ -62,6 +39,28 @@ plugins:
     # Directory to store FRR logs.
     # Default: [netgen_runstatedir]/frrlogs
     # logdir:
+
+  tcpdump:
+    # Directory to store tcpdump captures.
+    # Default: [netgen_runstatedir]/pcaps
+    # pcap_dir:
+
+    # Filter on which nodes tcpdump should run.
+    # Default: []
+    # whitelist:
+
+    # Filter on which nodes tcpdump should not run.
+    # Default: []
+    # blacklist:
+
+  tmux:
+    # Path of tmux script used to open a shell on all routers.
+    # Default: [netgen_runstatedir]/tmux.sh
+    # file:
+
+    # Panels per node.
+    # Default: 1
+    # panels-per-node:
 
   bird:
     # BIRD's sysconfdir (--sysconfdir).
@@ -87,93 +86,14 @@ plugins:
   bgpsimple:
     # Path to bgp_simple script
     # Default: "bgp_simple.pl"
-    path: '/mnt/renato/NetDEF/bgpsimple/bgpsimple/bgp_simple.pl'
+    # path:
 
   iou:
     # IOU working directory.
     # Default: [netgen_runstatedir]/iou
     # dir:
 
-    images:
-      l3-adventerprisek9-15.4.1T:
-        file: "/mnt/renato/Cisco/IOU/Cisco-IOU-L2-L3-Collection-v3/bin/i86bi-linux-l3-adventerprisek9-15.4.1T.bin"
-        ram: 512
-
   dynamips:
     # dynamips working directory.
     # Default: [netgen_runstatedir]/dynamips
     # dir:
-
-    images:
-      c7200_advipservices:
-        parameters: |
-          vm create rt 0 c7200
-          c7200 set_npe rt npe-400
-          vm set_ram_mmap rt 1
-          vm set_ios rt "/mnt/renato/Cisco/IOS/c7200/15.0/c7200-advipservicesk9-mz.152-4.S5.image"
-          vm set_ram rt 512
-          vm set_nvram rt 512
-          vm set_sparse_mem rt 1
-          vm set_idle_pc rt 0x63184bc8
-          vm set_blk_direct_jump rt 0
-          vm slot_add_binding rt 1 0 PA-2FE-TX
-          vm slot_add_binding rt 2 0 PA-2FE-TX
-          vm slot_add_binding rt 3 0 PA-2FE-TX
-          vm slot_add_binding rt 4 0 PA-2FE-TX
-        interfaces:
-          - [1, 0]
-          - [1, 1]
-          - [2, 0]
-          - [2, 1]
-          - [3, 0]
-          - [3, 1]
-          - [4, 0]
-          - [4, 1]
-      c7200_adventerprise:
-        parameters: |
-          vm create rt 0 c7200
-          c7200 set_npe rt npe-400
-          vm set_ram_mmap rt 1
-          vm set_ios rt "/mnt/renato/Cisco/IOS/c7200/15.0/c7200-adventerprisek9-mz.150-1.M.image"
-          vm set_ram rt 512
-          vm set_nvram rt 512
-          vm set_sparse_mem rt 1
-          vm set_idle_pc rt 0x606384b0
-          vm set_blk_direct_jump rt 0
-          vm slot_add_binding rt 1 0 PA-2FE-TX
-          vm slot_add_binding rt 2 0 PA-2FE-TX
-          vm slot_add_binding rt 3 0 PA-2FE-TX
-          vm slot_add_binding rt 4 0 PA-2FE-TX
-        interfaces:
-          - [1, 0]
-          - [1, 1]
-          - [2, 0]
-          - [2, 1]
-          - [3, 0]
-          - [3, 1]
-          - [4, 0]
-          - [4, 1]
-      c7200_advsecurity:
-        parameters: |
-          vm create rt 0 c7200
-          c7200 set_npe rt npe-400
-          vm set_ram_mmap rt 1
-          vm set_ios rt "/mnt/renato/Cisco/IOS/c7200/15.0/c7200-advsecurityk9-mz.152-4.M7.image"
-          vm set_ram rt 512
-          vm set_nvram rt 512
-          vm set_sparse_mem rt 1
-          vm set_idle_pc rt 0x6147adf4
-          vm set_blk_direct_jump rt 0
-          vm slot_add_binding rt 1 0 PA-2FE-TX
-          vm slot_add_binding rt 2 0 PA-2FE-TX
-          vm slot_add_binding rt 3 0 PA-2FE-TX
-          vm slot_add_binding rt 4 0 PA-2FE-TX
-        interfaces:
-          - [1, 0]
-          - [1, 1]
-          - [2, 0]
-          - [2, 1]
-          - [3, 0]
-          - [3, 1]
-          - [4, 0]
-          - [4, 1]
