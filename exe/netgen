@@ -41,7 +41,7 @@ opts = OptionParser.new do |op|
   end
   op.separator ''
   op.separator 'Example:'
-  op.separator "    #{File.basename(__FILE__)} examples/frr-ospf.yml"
+  op.separator "    #{File.basename(__FILE__)} examples/frr-isis-tutorial.yml"
   op.separator ''
 end
 
