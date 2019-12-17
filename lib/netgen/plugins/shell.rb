@@ -19,7 +19,7 @@ module Netgen
       return unless cmds
       cmds.each_line do |cmd|
         next if cmd.start_with?("#")
-        node.execute(cmd)
+        node.execute("sh -c '" + cmd + "'")
       end
     end
   end
