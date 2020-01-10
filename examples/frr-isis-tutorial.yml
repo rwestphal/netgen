@@ -431,7 +431,7 @@ routers:
         ipv4: 10.0.11.2/24
         mpls: yes
     shell: |
-      ip route add 9.9.9.1/32 via inet 10.0.11.1
+      ip route add 9.9.9.1/32 via inet 10.0.11.1 src 9.9.9.2
 
 switches:
   sw1:
