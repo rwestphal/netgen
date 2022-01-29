@@ -39,11 +39,9 @@ module Netgen
     def node_start(node)
       attributes = node.attributes['bird']
       return unless attributes
-      ['bird', 'bird6'].each do |daemon|
-        next unless attributes[daemon]
-        Netgen.log_info("starting #{daemon}", plugin: self, node: node)
-        node.spawn(daemon, options: { out: '/dev/null', err: '/dev/null' })
-      end
+      return unless attributes['bird']
+      Netgen.log_info("starting bird", plugin: self, node: node)
+      node.spawn("bird", options: { out: '/dev/null', err: '/dev/null' })
     end
 
     def node_exit(node)
@@ -64,9 +62,7 @@ module Netgen
 
     def create_config_files(node)
       attributes = node.attributes['bird']
-      ['bird', 'bird6'].each do |daemon|
-        create_config_file(node, daemon, attributes[daemon])
-      end
+      create_config_file(node, "bird", attributes["bird"])
     end
 
     def create_config_file(node, daemon, attributes)
@@ -94,37 +90,31 @@ module Netgen
 
     def autogen_node(type, _node_name, node, node_index)
       return unless type == Autogen::Router
-      ['bird', 'bird6'].each do |daemon|
-        next unless @autogen[daemon]
-        node['bird'] ||= {}
-        node['bird'][daemon] = {}
-        config = @autogen[daemon]['config'] || ''
-        node['bird'][daemon]['config'] = config
-      end
+      return unless @autogen["bird"]
+      node['bird'] ||= {}
+      node['bird']["bird"] = {}
+      config = @autogen["bird"]['config'] || ''
+      node['bird']["bird"]['config'] = config
     end
 
     def autogen_link(node, name, _local_attr, remote_attr)
-      ['bird', 'bird6'].each do |daemon|
-        next unless @autogen[daemon]
-        config = @autogen[daemon]['config-per-interface']
-        next unless config
-        config = config.gsub('%(interface)', name)
-        config = config.gsub('%(peer-v4)', remote_attr['ipv4'].split('/').first) if remote_attr['ipv4']
-        config = config.gsub('%(peer-v6)', remote_attr['ipv6'].split('/').first) if remote_attr['ipv6']
-        node['bird'][daemon]['config'] += config
-      end
+      return unless @autogen["bird"]
+      config = @autogen["bird"]['config-per-interface']
+      return unless config
+      config = config.gsub('%(interface)', name)
+      config = config.gsub('%(peer-v4)', remote_attr['ipv4'].split('/').first) if remote_attr['ipv4']
+      config = config.gsub('%(peer-v6)', remote_attr['ipv6'].split('/').first) if remote_attr['ipv6']
+      node['bird']["bird"]['config'] += config
     end
 
     def autogen_loopback(node, _node_index, name, attr)
-      ['bird', 'bird6'].each do |daemon|
-        next unless @autogen[daemon]
-        config = @autogen[daemon]['config-per-loopback']
-        next unless config
-        config = config.gsub('%(interface)', name)
-        config = config.gsub('%(address-v4)', attr['ipv4'].split('/').first) if attr['ipv4']
-        config = config.gsub('%(address-v6)', attr['ipv6'].split('/').first) if attr['ipv6']
-        node['bird'][daemon]['config'] += config
-      end
+      return unless @autogen["bird"]
+      config = @autogen["bird"]['config-per-loopback']
+      return unless config
+      config = config.gsub('%(interface)', name)
+      config = config.gsub('%(address-v4)', attr['ipv4'].split('/').first) if attr['ipv4']
+      config = config.gsub('%(address-v6)', attr['ipv6'].split('/').first) if attr['ipv6']
+      node['bird']["bird"]['config'] += config
     end
   end
 end

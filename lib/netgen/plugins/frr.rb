@@ -18,6 +18,8 @@ module Netgen
       sharpd
       staticd
       pbrd
+      pathd
+      mgmtd
     ]
 
     def name
@@ -60,7 +62,7 @@ module Netgen
       frr_attr = node.attributes['frr']
       return unless frr_attr
       @@daemons.each do |daemon|
-        next unless frr_attr.has_key?(daemon)
+        next unless frr_attr.has_key?(daemon) or daemon == "mgmtd"
         next if frr_attr.dig(daemon, 'run') == false
         delay = frr_attr.dig(daemon, 'delay') || nil
         args = frr_attr.dig(daemon, 'args') || ''
@@ -192,7 +194,7 @@ module Netgen
         node['frr'] ||= {}
         node['frr'][daemon] = {}
         config = @autogen[daemon]['config'] || ''
-        config = config.gsub('%(bgp-node-index)', "#{node_index + 1}")
+        config = config.gsub('%(bgp-node-index)', "#{node_index}")
         config = config.gsub('%(isis-node-index)', node_index.to_s.rjust(4, '0'))
         gen_static_routes(config, node_index) if daemon == 'zebra'
         node['frr'][daemon]['config'] = config
@@ -218,6 +220,8 @@ module Netgen
         next unless config
         config = config.gsub('%(interface)', name)
         config = config.gsub('%(node-index)', "#{node_index}")
+        node_index2 = node_index + 1000
+        config = config.gsub('%(node-index2)', "#{node_index2}")
         config = config.gsub('%(address-v4)', attr['ipv4'].split('/').first) if attr['ipv4']
         config = config.gsub('%(address-v6)', attr['ipv6'].split('/').first) if attr['ipv6']
         config = config.gsub('%(prefix-v4)', attr['ipv4']) if attr['ipv4']
@@ -233,6 +237,8 @@ module Netgen
         next unless config
         config = config.gsub('%(interface)', name)
         config = config.gsub('%(node-index)', "#{node_index}")
+        node_index2 = node_index + 1000
+        config = config.gsub('%(node-index2)', "#{node_index2}")
         config = config.gsub('%(stub-index)', "#{stub_index}")
         config = config.gsub('%(address-v4)', attr['ipv4'].split('/').first) if attr['ipv4']
         config = config.gsub('%(address-v6)', attr['ipv6'].split('/').first) if attr['ipv6']
