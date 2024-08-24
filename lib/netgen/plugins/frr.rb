@@ -68,11 +68,6 @@ module Netgen
         delay = frr_attr.dig(daemon, 'delay') || nil
         args = frr_attr.dig(daemon, 'args') || ''
 
-        # HACK: remove me!
-        if daemon == "staticd"
-          delay = 1
-        end
-
         if delay
           Netgen.log_info("scheduling to start #{daemon} in #{delay} seconds",
                           plugin: self, node: node)
