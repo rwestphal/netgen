@@ -192,7 +192,7 @@ module Netgen
         node['frr'] ||= {}
         node['frr'][daemon] = {}
         config = @autogen[daemon]['config'] || ''
-        config = config.gsub('%(bgp-node-index)', "#{node_index + 1}")
+        config = config.gsub('%(bgp-node-index)', "#{node_index}")
         config = config.gsub('%(isis-node-index)', node_index.to_s.rjust(4, '0'))
         gen_static_routes(config, node_index) if daemon == 'zebra'
         node['frr'][daemon]['config'] = config

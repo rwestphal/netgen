@@ -6,7 +6,7 @@ module Netgen
       attr_reader :name
       attr_reader :connections
 
-      @global_index = -1
+      @global_index = 0
       def self.next_index
         @global_index += 1
       end
@@ -67,7 +67,7 @@ module Netgen
 
       def initialize(name)
         super(name)
-        @loopback = "#{@name}-lo1"
+        @loopback = "lo"
         add_stubs
       end
 

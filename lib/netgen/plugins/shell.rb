@@ -22,5 +22,15 @@ module Netgen
         node.execute("sh -c '" + cmd + "'")
       end
     end
+
+    def autogen_parse(parameters)
+      # TODO: validate
+      @autogen = parameters || {}
+    end
+
+    def autogen_node(type, _node_name, node, node_index)
+      return unless @autogen
+      node['shell'] = @autogen
+    end
   end
 end
