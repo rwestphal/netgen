@@ -113,17 +113,17 @@ module Netgen
     # Spawn the given command under this node.
     # When this node is deleted, all non-detached child processes are
     # automatically killed.
-    def spawn(command, options: {}, delay: nil, mnt: true, pid: true, net: true)
+    def spawn(command, env: {}, options: {}, delay: nil, mnt: true, pid: true, net: true)
       command.prepend(nsenter(mnt: mnt, pid: pid, net: net))
 
       # Sleep on a separate thread if necessary
       if delay
         Thread.new do
           sleep delay
-          do_spawn(command, options: options)
+          do_spawn(command, env: env, options: options)
         end
       else
-        do_spawn(command, options: options)
+        do_spawn(command, env: env, options: options)
       end
     rescue SystemCallError => e
       $stderr.puts "System call error:: #{e.message}"
@@ -131,9 +131,9 @@ module Netgen
       exit(1)
     end
 
-    def do_spawn(command, options: {})
+    def do_spawn(command, env: {}, options: {})
       Netgen.log_debug("spawn '#{command}'", node: self)
-      pid = Process.spawn(command, options)
+      pid = Process.spawn(env, command, options)
       Process.detach(pid)
     end
 
