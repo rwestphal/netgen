@@ -40,6 +40,27 @@ plugins:
     # Default: [netgen_runstatedir]/frrlogs
     # logdir:
 
+  holod:
+    # FRR's sysconfdir (--sysconfdir).
+    # Default: "/etc/holod"
+    # sysconfdir:
+
+    # FRR's localstatedir (--localstatedir).
+    # Default: "/var/run/holo"
+    # localstatedir:
+
+    # Directory to store FRR logs.
+    # Default: [netgen_runstatedir]/holod-logs
+    # logdir:
+
+    # holod's user.
+    # Default: "holo"
+    # user:
+
+    # holod's group.
+    # Default: "holo"
+    # group:
+
   tcpdump:
     # Directory to store tcpdump captures.
     # Default: [netgen_runstatedir]/pcaps
