@@ -68,6 +68,9 @@ module Netgen
         delay = frr_attr.dig(daemon, 'delay') || nil
         args = frr_attr.dig(daemon, 'args') || ''
 
+        out = "#{@cfg['logdir']}/#{node.name}-#{daemon}.out"
+        err = "#{@cfg['logdir']}/#{node.name}-#{daemon}.err"
+
         if delay
           Netgen.log_info("scheduling to start #{daemon} in #{delay} seconds",
                           plugin: self, node: node)
@@ -75,7 +78,7 @@ module Netgen
           Netgen.log_info("starting #{daemon}", plugin: self, node: node)
         end
         node.spawn("#{valgrind(node, daemon)}#{perf(node, daemon)}#{daemon} #{args}",
-                   options: { out: '/dev/null', err: '/dev/null' }, delay: delay)
+                   options: { out: out, err: err }, delay: delay)
       end
       node.spawn("vtysh -b", options: { out: '/dev/null', err: '/dev/null' }, delay: 3)
     end
