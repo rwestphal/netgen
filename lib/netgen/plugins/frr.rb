@@ -18,6 +18,9 @@ module Netgen
       sharpd
       staticd
       pbrd
+      pathd
+      mgmtd
+      vrrpd
     ]
 
     def name
@@ -60,7 +63,7 @@ module Netgen
       frr_attr = node.attributes['frr']
       return unless frr_attr
       @@daemons.each do |daemon|
-        next unless frr_attr.has_key?(daemon)
+        next unless frr_attr.has_key?(daemon) or daemon == "mgmtd"
         next if frr_attr.dig(daemon, 'run') == false
         delay = frr_attr.dig(daemon, 'delay') || nil
         args = frr_attr.dig(daemon, 'args') || ''
