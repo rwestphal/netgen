@@ -18,8 +18,8 @@ module Netgen
 
     def default_config
       {
-        'bindir-daemon' => '/mnt/renato/git/rust/holo/target/debug',
-        'bindir-cli' => '/mnt/renato/git/rust/holo-cli/target/debug',
+        'bindir-daemon' => '/usr/bin/',
+        'bindir-cli' => '/usr/bin/',
         'sysconfdir' => '/etc/holod',
         'localstatedir' => '/var/run/holo',
         'user' => 'holo',

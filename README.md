@@ -28,8 +28,8 @@ $ yum install ruby ruby-devel
 ### Install the bundler gem (version 1.15 is needed):
 
 ```
-$ gem install bundler -v 1.15
-$ bundle _1.15_ install
+$ gem install bundler -v 2.5.20
+$ bundle _2.5.20_ install
 ```
 
 If you are getting timeouts you might have run into an [IPv6 issue](https://help.rubygems.org/discussions/problems/31074-timeout-error).
@@ -61,7 +61,7 @@ Two configuration files are needed to set up a `netgen` topology:
 Then `netgen` can be started like this (using superuser permissions):
 
 ```
-$ netgen -f config.yml topology.yml
+$ netgen -c config.yml topology.yml
 ```
 
 By default the `config.yml` is taken from the current directory, so a
